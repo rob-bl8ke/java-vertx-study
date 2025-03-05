@@ -1,13 +1,20 @@
 package com.cyg.demo;
 
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
 public class MainVerticle extends AbstractVerticle {
 
     @Override
-    public void start() {
+    public void start(Promise<Void> start) {
 
         vertx.deployVerticle((new HelloVerticle()));
 
@@ -16,16 +23,39 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
 
-        int httpPort;
-        try {
-            httpPort = Integer.parseInt(System.getProperty("http.port", "8080"));
-        } catch (NumberFormatException e) {
-            httpPort = 8080;
-        }
+        ConfigStoreOptions defaultConfig = new ConfigStoreOptions()
+                .setType("file")
+                .setFormat("json")
+                .setConfig(new JsonObject().put("path", "config.json"));
 
-        vertx.createHttpServer()
-                .requestHandler(router)
-                .listen(httpPort);
+        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
+                .addStore(defaultConfig);
+
+        ConfigRetriever configRetriever = ConfigRetriever.create(vertx, options);
+
+        // Curried function to handle the results of the configuration retrieval
+        Handler<AsyncResult<JsonObject>> handler = asyncResult -> this.HandleConfigResults(start, router, asyncResult);
+        configRetriever.getConfig(handler);
+    }
+
+    void HandleConfigResults(Promise<Void> start, Router router, AsyncResult<JsonObject> asyncResult) {
+        if (asyncResult.succeeded()) {
+            JsonObject config = asyncResult.result();
+            JsonObject http = config.getJsonObject("http");
+
+            // Can check that this works by changing the port in the config.json file
+            int httpPort = http.getInteger("port", 8080);
+
+            vertx.createHttpServer()
+                    .requestHandler(router)
+                    .listen(httpPort);
+            
+            start.complete();
+
+        } else {
+            System.out.println("Failed to retrieve the configuration.");
+            start.fail("Unable to load configuration.");
+        }
     }
 
     void helloVertx(RoutingContext ctx) {
