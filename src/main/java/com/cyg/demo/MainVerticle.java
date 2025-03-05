@@ -15,9 +15,6 @@ public class MainVerticle extends AbstractVerticle {
         DeploymentOptions options = new DeploymentOptions().setWorker(true).setInstances(instances);
         vertx.deployVerticle("com.cyg.demo.HelloVerticle", options);
 
-        // Deploy the HelloVerticle
-        vertx.deployVerticle(new HelloVerticle());
-
         Router router = Router.router(vertx);
         // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
