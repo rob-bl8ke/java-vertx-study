@@ -23,6 +23,10 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
 
+        doConfig(start, router);
+    }
+
+    private void doConfig(Promise<Void> start, Router router) {
         ConfigStoreOptions defaultConfig = new ConfigStoreOptions()
                 .setType("file")
                 .setFormat("json")
