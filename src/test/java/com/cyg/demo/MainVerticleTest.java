@@ -26,15 +26,15 @@ public class MainVerticleTest {
         vertx = Vertx.vertx();
         Async async = context.async();
 
-        // Override the configuration to restrict the number of instances to 1 for testing
-        DeploymentOptions options = new DeploymentOptions()
-            .setConfig(new JsonObject()
-                .put("helloVerticle.instances", 1)
-                // doesn't work - does not override the configuration
-                // .put("http.port", PORT)
-            );
+        // // Override the configuration to restrict the number of instances to 1 for testing
+        // DeploymentOptions options = new DeploymentOptions()
+        //     .setConfig(new JsonObject()
+        //         // doesn't work - does not override the configuration
+        //         // .put("http.port", PORT)
+        //     );
 
-        vertx.deployVerticle(MainVerticle.class.getName(), options, res -> {
+        // vertx.deployVerticle(MainVerticle.class.getName(), options, res -> {
+        vertx.deployVerticle(MainVerticle.class.getName(), res -> {
             if (res.succeeded()) {
                 // Consider adding a small delay to ensure the server is fully started
                 // if you run into flakey test issues.
