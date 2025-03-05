@@ -18,6 +18,9 @@ public class MainVerticleTest {
 
     private Vertx vertx;
 
+    // Ensure this is set to the same port as the value in the config.json file in resources.
+    private static final int PORT = 8089;
+
     @Before
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
@@ -25,7 +28,11 @@ public class MainVerticleTest {
 
         // Override the configuration to restrict the number of instances to 1 for testing
         DeploymentOptions options = new DeploymentOptions()
-            .setConfig(new JsonObject().put("helloVerticle.instances", 1));
+            .setConfig(new JsonObject()
+                .put("helloVerticle.instances", 1)
+                // doesn't work - does not override the configuration
+                // .put("http.port", PORT)
+            );
 
         vertx.deployVerticle(MainVerticle.class.getName(), options, res -> {
             if (res.succeeded()) {
@@ -54,7 +61,7 @@ public class MainVerticleTest {
         WebClient client = WebClient.create(vertx);
         Async async = context.async();
 
-        client.get(8080, "localhost", "/api/v1/hello")
+        client.get(PORT, "localhost", "/api/v1/hello")
                 .send(ar -> {
                     if (ar.succeeded()) {
                         context.assertEquals("Hello Vert.x World!", ar.result().bodyAsString());
@@ -73,7 +80,7 @@ public class MainVerticleTest {
         WebClient client = WebClient.create(vertx);
         Async async = context.async();
 
-        client.get(8080, "localhost", "/api/v1/hello/John")
+        client.get(PORT, "localhost", "/api/v1/hello/John")
                 .send(ar -> {
                     if (ar.succeeded()) {
                         String response = ar.result().bodyAsString();
