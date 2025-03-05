@@ -1,7 +1,6 @@
 package com.cyg.demo;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
@@ -9,20 +8,24 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        int instances = config().getInteger("helloVerticle.instances", 8);
 
-        // Deploy the HelloVerticle as a worker verticle with 8 instances
-        DeploymentOptions options = new DeploymentOptions().setWorker(true).setInstances(instances);
-        vertx.deployVerticle("com.cyg.demo.HelloVerticle", options);
+        vertx.deployVerticle((new HelloVerticle()));
 
         Router router = Router.router(vertx);
         // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
 
+        int httpPort;
+        try {
+            httpPort = Integer.parseInt(System.getProperty("http.port", "8080"));
+        } catch (NumberFormatException e) {
+            httpPort = 8080;
+        }
+
         vertx.createHttpServer()
                 .requestHandler(router)
-                .listen(8080);
+                .listen(httpPort);
     }
 
     void helloVertx(RoutingContext ctx) {
