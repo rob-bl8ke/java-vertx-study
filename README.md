@@ -29,3 +29,40 @@ public class MainVerticle extends AbstractVerticle {
 
 
 You'll see that Vert.x has started running. Browse to "http://localhost:8080/".
+
+# Adding additional Vert.x Dependencies
+
+When the project is generated a dependency chain is set up..
+
+```xml
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-stack-depchain</artifactId>
+                <version>${vertx.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+```
+
+This means that Vert.x dependencies can be added one after another and will be compatible with the vert.x specified vert.x version.
+
+Add teh `vertx-web` dependency to use the Router.
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+        </dependency>
+    </dependencies>
+```
+
+
