@@ -1,8 +1,13 @@
 package com.cyg.demo;
 
+import java.util.UUID;
+
 import io.vertx.core.AbstractVerticle;
 
 public class HelloVerticle extends AbstractVerticle {
+
+    // Identity of the verticle
+    String verticleId = UUID.randomUUID().toString();
 
     @Override
     public void start() {
@@ -17,7 +22,7 @@ public class HelloVerticle extends AbstractVerticle {
         // the name from the message body
         vertx.eventBus().consumer("hello.name.addr", message -> {
             String name = (String) message.body();
-            message.reply(String.format("Hello %s!", name));
+            message.reply(String.format("Hello %s from %s!", name, verticleId));
         });
     }
     

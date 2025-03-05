@@ -71,3 +71,11 @@ Add the `vertx-web` dependency to use the Router.
   mvn clean install
   mvn test
 ```
+
+# Issues
+
+Following [this tutorial on clustering](https://www.youtube.com/watch?v=R3Iofu5byPk&list=PLkeCJDaCC2ZsnySdg04Aq9D9FpAZY6K5D&index=5), I currently cannot get it to work. The code is here and the tests run, but the following command simply does not work:
+
+```bash
+java -Djava.net.preferIPv4Stack=true -Dhttp.port=8090 -jar target/vertx-demo-1.0-SNAPSHOT.jar -cluster
+```

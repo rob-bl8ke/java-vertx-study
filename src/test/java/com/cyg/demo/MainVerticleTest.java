@@ -76,7 +76,11 @@ public class MainVerticleTest {
         client.get(8080, "localhost", "/api/v1/hello/John")
                 .send(ar -> {
                     if (ar.succeeded()) {
-                        context.assertEquals("Hello John!", ar.result().bodyAsString());
+                        String response = ar.result().bodyAsString();
+                        // Use a regular expression to match the expected pattern
+                        String expectedPattern = "Hello John from [a-fA-F0-9\\-]{36}!";
+                        context.assertTrue(response.matches(expectedPattern), "Response does not match the expected pattern");
+    
                         async.complete();
                     } else {
                         context.fail(ar.cause());
