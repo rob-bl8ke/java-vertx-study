@@ -8,12 +8,13 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
+
+        // Deploy the HelloVerticle
+        vertx.deployVerticle(new HelloVerticle());
+
         Router router = Router.router(vertx);
-
-        // GET without a path parameter
+        // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
-
-        // GET with a path parameter
         router.get("/api/v1/hello/:name").handler(this::helloName);
 
         vertx.createHttpServer()
@@ -22,11 +23,17 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     void helloVertx(RoutingContext ctx) {
-        ctx.request().response().end("Hello Vert.x World!");
+        // Send a message to the event bus and expect a reply
+        vertx.eventBus().request("hello.vertx.addr", "", reply -> {
+            ctx.request().response().end((String)reply.result().body());
+        });
     }
 
     void helloName(RoutingContext ctx) {
+        // Send a message to the event bus and expect a reply (with a name)
         String name = ctx.pathParam("name");
-        ctx.request().response().end(String.format("Hello %s!", name));
+        vertx.eventBus().request("hello.name.addr", name, reply -> {
+            ctx.request().response().end((String)reply.result().body());
+        });
     }
 }

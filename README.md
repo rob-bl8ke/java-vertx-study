@@ -50,7 +50,7 @@ When the project is generated a dependency chain is set up..
 
 This means that Vert.x dependencies can be added one after another and will be compatible with the vert.x specified vert.x version.
 
-Add teh `vertx-web` dependency to use the Router.
+Add the `vertx-web` dependency to use the Router.
 
 ```xml
     <dependencies>
@@ -65,4 +65,9 @@ Add teh `vertx-web` dependency to use the Router.
     </dependencies>
 ```
 
+# Run the tests
 
+```bash
+  mvn clean install
+  mvn test
+```
