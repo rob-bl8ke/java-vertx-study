@@ -1,6 +1,7 @@
 package com.cyg.demo;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
@@ -8,6 +9,11 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
+        int instances = config().getInteger("helloVerticle.instances", 8);
+
+        // Deploy the HelloVerticle as a worker verticle with 8 instances
+        DeploymentOptions options = new DeploymentOptions().setWorker(true).setInstances(instances);
+        vertx.deployVerticle("com.cyg.demo.HelloVerticle", options);
 
         // Deploy the HelloVerticle
         vertx.deployVerticle(new HelloVerticle());

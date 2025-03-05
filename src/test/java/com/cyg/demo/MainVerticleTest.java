@@ -1,10 +1,13 @@
 package com.cyg.demo;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.client.WebClient;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +22,12 @@ public class MainVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
         Async async = context.async();
-        vertx.deployVerticle(MainVerticle.class.getName(), res -> {
+
+        // Override the configuration to restrict the number of instances to 1 for testing
+        DeploymentOptions options = new DeploymentOptions()
+            .setConfig(new JsonObject().put("helloVerticle.instances", 1));
+
+        vertx.deployVerticle(MainVerticle.class.getName(), options, res -> {
             if (res.succeeded()) {
                 // Consider adding a small delay to ensure the server is fully started
                 // if you run into flakey test issues.
