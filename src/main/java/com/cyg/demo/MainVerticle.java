@@ -19,6 +19,29 @@ public class MainVerticle extends AbstractVerticle {
         vertx.deployVerticle((new HelloVerticle()));
 
         Router router = Router.router(vertx);
+
+        // Middleware to check for an auth token
+        // Can use it to check for a valid token before allowing access to the API
+        // Can also add headers (to allow CORS, etc.)
+        router.route().handler(ctx -> {
+            // ctx.response()
+            //         .putHeader("content-type", "application/json")
+            //         .putHeader("Access-Control-Allow-Origin", "*")
+            //         .putHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+            //         .putHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            //         .putHeader("Access-Control-Allow-Credentials", "true");
+
+            // String authToken = ctx.request().getHeader("Authorization");
+            String authToken = ctx.request().getHeader("AUTH_TOKEN");
+            if (authToken == null || !authToken.equals("mySuperSecretAuthToken")) {
+                ctx.response().setStatusCode(401).end("Unauthorized");
+                return;
+            }
+            ctx.next();
+        });
+
+        
+
         // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
@@ -63,16 +86,18 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     void helloVertx(RoutingContext ctx) {
-        // Send a message to the event bus and expect a reply
+        // Send a message to the event bus and expect a reply (from HelloVerticle)
         vertx.eventBus().request("hello.vertx.addr", "", reply -> {
+            // Replies back over http to the client (browser)
             ctx.request().response().end((String)reply.result().body());
         });
     }
 
     void helloName(RoutingContext ctx) {
-        // Send a message to the event bus and expect a reply (with a name)
+        // Send a message to the event bus and expect a reply (with a name from HelloVerticle)
         String name = ctx.pathParam("name");
         vertx.eventBus().request("hello.name.addr", name, reply -> {
+            // Replies back over http to the client (browser)
             ctx.request().response().end((String)reply.result().body());
         });
     }

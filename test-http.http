@@ -1,0 +1,23 @@
+@Port = 8089
+@UserName = Julie
+@Token = mySuperSecretAuthToken
+###
+# Unauthorized request for /api/v1/hello
+http://localhost:{{Port}}/api/v1/hello
+Accept: application/text
+
+###
+# Unauthorized request for /api/v1/hello
+http://localhost:{{Port}}/api/v1/hello/{{UserName}}
+Accept: application/text
+
+###
+# Authorized request for /api/v1/hello
+http://localhost:{{Port}}/api/v1/hello
+Accept: application/text
+AUTH_TOKEN: {{Token}}
+###
+# Authorized request for /api/v1/hello
+http://localhost:{{Port}}/api/v1/hello/{{UserName}}
+Accept: application/text
+AUTH_TOKEN: {{Token}}
