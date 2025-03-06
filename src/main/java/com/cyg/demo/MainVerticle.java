@@ -56,13 +56,27 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void doConfig(Promise<Void> start, Router router) {
+
+        // Port 8089 is configured for the default configuration in the config.json file
+        // Can be overridden by the command line argument --conf
+        // Example: java -jar target/vertx-demo-1.0-SNAPSHOT-fat.jar --conf src/main/resources/config.json
         ConfigStoreOptions defaultConfig = new ConfigStoreOptions()
                 .setType("file")
                 .setFormat("json")
                 .setConfig(new JsonObject().put("path", "config.json"));
 
+        // This will override the default configuration
+        ConfigStoreOptions cliConfig = new ConfigStoreOptions()
+                .setType("json")        // no file, only command line
+                .setConfig(config());
+
+        // The CLI will always override the default configuration
         ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(defaultConfig);
+                // lowest preference
+                .addStore(defaultConfig)
+                // highest preference
+                .addStore(cliConfig)
+                ;
 
         ConfigRetriever configRetriever = ConfigRetriever.create(vertx, options);
 

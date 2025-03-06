@@ -1,3 +1,40 @@
+# Jar file help
+
+Create the jar file and run its help command to see all its options.
+
+- [Reference material](https://youtu.be/bZzzkSOl55c?list=PLkeCJDaCC2ZsnySdg04Aq9D9FpAZY6K5D) for this section.
+
+```bash
+# creates the jar file in your target folder
+mvn clean package
+
+# Get help to show the main commands
+java -jar target/vertx-demo-1.0-SNAPSHOT.jar --help
+
+# Get some help for the run command
+# Lots of configuration options
+# Shows lots of options including --cluster and passing --conf (config)
+java -jar target/vertx-demo-1.0-SNAPSHOT.jar run --help
+```
+
+# Running in the terminal with custom settings
+
+- [Reference material](https://youtu.be/bZzzkSOl55c?list=PLkeCJDaCC2ZsnySdg04Aq9D9FpAZY6K5D) for this section.
+
+Create a new configuration file at the root of the solution and give it the desired settings. In this example its configuration for the port. Depending on how you run the application, you'll pick up a different port since a different configuration is being targeted. This migh be useful for testing.
+
+```bash
+# Create a new configuration file and add settings to it...
+touch testConfig.json
+
+# Run on the default settings
+mvn clean compile vertx:run
+
+# Create a new package (jar file) and run it from the terminal using custom settings
+mvn clean package
+java -jar target/vertx-demo-1.0-SNAPSHOT.jar run --conf testConfig.json com.cyg.demo.MainVerticle
+```
+
 # Invoke endpoints
 
 Use the [Rest Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) or simply use one of the terminal commands below:
