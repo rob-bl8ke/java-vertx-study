@@ -1,3 +1,9 @@
+# Original Tutorial Resources
+
+- [Introduction to vert.x Playlist](https://www.youtube.com/playlist?list=PLkeCJDaCC2ZsnySdg04Aq9D9FpAZY6K5D)
+- [GitHub Repo](https://github.com/InfoSec812/intro-to-vertx/tree/Vertx_execute_blocking_code)
+
+
 # Jar file help
 
 Create the jar file and run its help command to see all its options.
