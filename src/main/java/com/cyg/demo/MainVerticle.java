@@ -1,5 +1,7 @@
 package com.cyg.demo;
 
+import org.infinispan.distribution.topologyaware.TopologyInfo.Cluster;
+
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -10,6 +12,14 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.CSRFHandler;
+import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.LoggerHandler;
+import io.vertx.ext.web.handler.SessionHandler;
+import io.vertx.ext.web.handler.impl.CorsHandlerImpl;
+import io.vertx.ext.web.sstore.ClusteredSessionStore;
+import io.vertx.ext.web.sstore.LocalSessionStore;
+import io.vertx.ext.web.sstore.SessionStore;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -19,6 +29,32 @@ public class MainVerticle extends AbstractVerticle {
         vertx.deployVerticle((new HelloVerticle()));
 
         Router router = Router.router(vertx);
+
+        // Enable clustered session storage
+        // SessionStore clusteredSessionStore = ClusteredSessionStore.create(vertx);
+        // router.route().handler(SessionHandler.create(clusteredSessionStore));
+        // or
+        // Enable local session storage
+        // Store information about users... sets a Session Id header
+        SessionStore localSessionStore = LocalSessionStore.create(vertx);
+        router.route().handler(SessionHandler.create(localSessionStore));
+
+        // CORS
+        router.route().handler(CorsHandler.create("localhost"));
+        // router.route().handler(CorsHandler.create("*.example.com"));
+        // Careful using this (all) as you cannot allow credentials at the same time
+        // router.route().handler(CorsHandler.create("*"));
+
+        // Log every request coming in
+        router.route().handler(LoggerHandler.create());
+
+        // CSRF - Cross Site Request Forgery and using a generated secret
+        router.route().handler(CSRFHandler.create(vertx, "wjO+ojoXMZUX8N0Vm8D1DXfzWJSznbcszYZM5pEOlTDPQTX4XLrENMePGbSBOBk9dagU1MwgVJR8"));
+        // Generate a secret at the command line with "dd if=/dev/urandom bs=384 count=1 2>/dev/null | base64"
+        // Copy a line and use it as your secret
+
+        // Cookies are handled out-of-the-box by Vert.x session handling
+
         // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
