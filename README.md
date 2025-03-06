@@ -1,3 +1,18 @@
+# Invoke endpoints
+
+Use the [Rest Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) or simply use one of the terminal commands below:
+
+```
+curl -H "AUTH_TOKEN: mySuperSecretAuthToken" http://localhost:8089/api/v1/hello
+```
+or 
+```
+wget --header="AUTH_TOKEN: mySuperSecretAuthToken" http://localhost:8089/api/v1/hello
+```
+or
+```
+Invoke-RestMethod -Uri http://localhost:8089/api/v1/hello -Headers @{"AUTH_TOKEN"="mySuperSecretAuthToken"}
+```
 
 # Create a new Vert.x project
 

@@ -10,6 +10,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.StaticHandler;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -45,6 +46,11 @@ public class MainVerticle extends AbstractVerticle {
         // Exposed endpoints
         router.get("/api/v1/hello").handler(this::helloVertx);
         router.get("/api/v1/hello/:name").handler(this::helloName);
+
+        // Serve static files from the web directory
+        // Falls back to index.html static content 
+        router.route().handler(StaticHandler.create("web")
+            .setIndexPage("index.html"));
 
         doConfig(start, router);
     }
