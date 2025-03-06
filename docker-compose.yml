@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+  db:
+    image: postgres:17.4
+    hostname: psql
+    container_name: poc-db-postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: todo
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - 5532:5432

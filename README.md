@@ -1,3 +1,30 @@
+# References for this Example
+
+- [Source Github Repository](https://github.com/InfoSec812/intro-to-vertx/tree/Vertx_execute_blocking_code)
+- [Redgate Flyway](https://www.red-gate.com/products/flyway/community/) for Migrations
+- [Currying](https://en.wikipedia.org/wiki/Currying)
+
+
+Let's call some blocking code:
+
+```java
+// Lets call blocking code or a blocking library
+vertx.executeBlocking(promise -> {
+    // Simulate a long running operation
+    try {
+        Thread.sleep(5000);
+        promise.complete();
+    } catch (InterruptedException e) {
+        promise.fail(e);
+    }
+}, res -> {
+    if (res.succeeded()) {
+        System.out.println("Blocking code executed successfully.");
+    } else {
+        System.out.println("Blocking code failed to execute.");
+    }
+});
+```
 
 # Create a new Vert.x project
 

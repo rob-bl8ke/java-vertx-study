@@ -1,5 +1,8 @@
 package com.cyg.demo;
 
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
+
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -10,20 +13,39 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-
 public class MainVerticle extends AbstractVerticle {
-
     @Override
     public void start(Promise<Void> start) {
+        vertx.deployVerticle(new HelloVerticle());
 
-        vertx.deployVerticle((new HelloVerticle()));
+        // The reason why we need to create this curried result is because handler by default
+        // only accepts one parameter, so we need to create a new handler that accepts two
+        Handler<AsyncResult<Void>> dbMigrationResultHandler = result -> this.handleMigrationResult(start, result);
+        vertx.executeBlocking(this::doDatabaseMigrations, dbMigrationResultHandler);
 
         Router router = Router.router(vertx);
-        // Exposed endpoints
-        router.get("/api/v1/hello").handler(this::helloVertx);
-        router.get("/api/v1/hello/:name").handler(this::helloName);
+
+        router.get("/api/v1/hello").handler(this::helloHandler);
+        router.get("/api/v1/hello/:name").handler(this::helloByNameHandler);
 
         doConfig(start, router);
+    }
+
+    void handleMigrationResult(Promise<Void> start, AsyncResult<Void> result) {
+        if (result.failed()) {
+            start.fail(result.cause());
+        }
+    }
+
+    void doDatabaseMigrations(Promise<Void> promise) {
+        Flyway flyway = Flyway.configure().dataSource("jdbc:postgresql://127.0.0.1:5532/todo", "admin", "admin").load();
+
+        try {
+            flyway.migrate();
+            promise.complete();
+        } catch (FlywayException fe) {
+            promise.fail(fe);
+        }
     }
 
     private void doConfig(Promise<Void> start, Router router) {
@@ -62,14 +84,14 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
-    void helloVertx(RoutingContext ctx) {
+    void helloHandler(RoutingContext ctx) {
         // Send a message to the event bus and expect a reply
         vertx.eventBus().request("hello.vertx.addr", "", reply -> {
             ctx.request().response().end((String)reply.result().body());
         });
     }
 
-    void helloName(RoutingContext ctx) {
+    void helloByNameHandler(RoutingContext ctx) {
         // Send a message to the event bus and expect a reply (with a name)
         String name = ctx.pathParam("name");
         vertx.eventBus().request("hello.name.addr", name, reply -> {
