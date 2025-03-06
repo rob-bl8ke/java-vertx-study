@@ -17,7 +17,8 @@ public class MainVerticle extends AbstractVerticle {
     @Override
     public void start(Promise<Void> start) {
 
-        vertx.deployVerticle((new HelloVerticle()));
+        vertx.deployVerticle("Hello.groovy");
+        // vertx.deployVerticle("Hello.js");
 
         Router router = Router.router(vertx);
 
